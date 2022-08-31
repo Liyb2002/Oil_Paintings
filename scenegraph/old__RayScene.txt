@@ -1,0 +1,204 @@
+#include "RayScene.h"
+#include "Settings.h"
+#include "CS123SceneData.h"
+#include "Canvas2D.h"
+
+
+
+#include <iostream>
+
+//Question:
+//1.How to read Scene data? (MainWindow::renderImage() read fail)
+//2.How to do arrow shooting (3D) on a 2D plane? getD fails at first
+//3.What is World matirx (M_world) and how to calculate it?
+//4.How to know how many objects are in the scene?
+
+RayScene::RayScene(Scene &scene) :
+    Scene(scene)
+{
+    // TODO [INTERSECT]
+    // Remember that any pointers or OpenGL objects (e.g. texture IDs) will
+    // be deleted when the old scene is deleted (assuming you are managing
+    // all your memory properly to prevent memory leaks).  As a result, you
+    // may need to re-allocate some things here.
+
+    global = { 1, 1, 1, 1};
+
+    //hard coded numLights
+    numLights = 1;
+    setGlobal(global);
+    initializeSceneMaterial();
+    initializeSceneLight();
+
+
+}
+void RayScene::render(Canvas2D* canvas, CS123SceneCameraData *camera) {
+
+
+
+//    std::cout <<"render!";
+    RGBA *pix = canvas->data();
+  /* int size = canvas->width() * canvas->height();
+      std::cout <<"brush dragging";
+
+    for (int i = 0; i < size; i++) {
+        pix[i] = RGBA(255, 0, 255, 0);
+    }
+    canvas->update();
+*/
+    //step 0: generate a circle, assume it is the object
+    int circleX = 100;
+    int circleY = 100;
+    int circleRadius = 40;
+    generateCircle(circleX,circleY,circleRadius,canvas);
+
+    glm::vec2 eyePosition = {0,0};
+
+
+    for(int j=0; j<canvas->height()-1; j++){
+        for(int i=0; i<canvas->width()-1; i++){
+
+            /*
+        //step 1: getD
+        glm::vec2 thisD = getD(i,j,canvas, camera);
+
+        //step2 : getT
+        float tVal = getT( circleRadius, thisD);
+
+        //step2.2 find the intersection point
+        glm::vec2 intersectPoint = thisD * tVal;
+        */
+
+        //Find intersectionPoint in a 2D plane for a circle:
+            if(j>circleY-circleRadius && j < circleY && i<circleX && i>circleX-circleRadius){
+                if((circleY-j)*(circleY-j)+(circleX-i)*(circleX-i)<circleRadius*circleRadius && (circleY-j)*(circleY-j)+(circleX-i)*(circleX-i)>circleRadius*circleRadius - 200){
+            std::cout <<i << j<< std::endl;
+
+
+                glm::vec2 intersectPoint = {i, j};
+        //step2.3 find normal of the intersection point
+        glm::vec2 normal_world = findNormal(intersectPoint, circleX, circleY);
+
+        //step3 : apply formula
+       glm::vec4 light = IllModel(normal_world);
+        pix[j*canvas->width() + i] = RGBA(light[0],light[1],light[2],light[3]);
+     //   pix[j*canvas->width() + i] = RGBA(25, 180, 33, 0);
+            }
+}
+        }
+    }
+
+
+
+
+    canvas->update();
+
+
+}
+
+glm::vec2 RayScene:: getD(int i, int j, Canvas2D* canvas, CS123SceneCameraData *camera){
+    float x = (i+0.5)/canvas->width() - 0.5;
+    float y = (j+0.5)/canvas->height() - 0.5;
+
+    //set theta_w as 30.f
+    //set theta_h as 60.f
+    //set k as 10.f
+    float u = 2 * 10.0f  * glm::tan(30.0f);
+    float v = 2 * 10.0f * glm::tan(60.0f);
+
+    glm::vec2 UVK = {u*x,v*y};
+    glm::vec2 eye = {0,0};
+    glm::vec2 d = UVK - eye;
+  //  glm::vec3 d2 = glm::normalize(d);
+    d = glm::normalize(d);
+/*
+    if(i< 2 && j< 2){
+  //     std::cout << camera->focalLength <<" " <<glm::tan(60.0f)<< " ";
+       std::cout << d.x <<" " << d.y <<std::endl;
+    }
+*/
+
+    return d;
+
+}
+
+void RayScene::generateCircle(int startRow, int startCol, int radius, Canvas2D* canvas){
+    RGBA *pix = canvas->data();
+     std::cout <<"generateSquare!!" << canvas->width() <<std::endl;
+     int sqrt = radius * radius ;
+
+
+      for(int i=glm::max(0,startCol-radius); i<glm::min(canvas->height(), startCol+radius); i++){
+          for(int j=glm::max(0,startRow-radius); j<glm::min(canvas->width(),startRow+radius); j++){
+                    if( (i-startCol)*(i-startCol) + (j-startRow)*(j-startRow) < sqrt){
+                         pix[i*canvas->width()+j] = RGBA(255, 80, 70, 0);
+                    }
+
+          }
+      }
+
+    canvas->update();
+}
+
+//for circle
+float RayScene::getT( int objectRadius, glm::vec2 d){
+    //t*d.x^2 + t*d.y^2 - objectRadius^2 = 0
+    //t^2*(dx^2+dy^2)=objectRadius^2
+    //t=objectRadius/sqrt(dx^2+dy^2)
+
+    float bot = glm::sqrt(d.x*d.x + d.y*d.y);
+
+
+     return objectRadius/bot;
+}
+
+
+glm::vec2 RayScene::findNormal(glm::vec2 intersectPoint, int x, int y){
+    glm::vec2 n_obj = {2*intersectPoint.x, 2*intersectPoint.y};
+    glm::mat2x2 world_M = {x,0,0,y};
+    glm::mat2x2 world_M_inverse = glm::inverse(world_M);
+    return world_M_inverse * n_obj;
+
+}
+
+glm::vec4 RayScene::IllModel(glm::vec2 normal_world){
+    //I = k_a * O_a + Sigma[I_m * (k_d * O_d * n * L_m)]
+
+    glm::vec4 I = {0,0,0,0};
+    float k_a = global.ka;
+    glm::vec4 O_a = m_material.cAmbient;
+
+    glm::vec4 I_m = m_light.color;
+    float k_d = global.kd;
+    glm::vec4 O_d = m_material.cDiffuse;
+    glm::vec2 Lm = {1.f,1.f};
+
+    I = k_a * O_a + glm::dot(I_m,(k_d*O_d * (glm::dot(normal_world,Lm))));
+    return I;
+}
+
+void RayScene::initializeSceneMaterial() {
+    // Use a shiny orange material
+    m_material.clear();
+    m_material.cAmbient.r = 0.2f;
+    m_material.cAmbient.g = 0.1f;
+    m_material.cDiffuse.r = 1.0f;
+    m_material.cDiffuse.g = 0.5f;
+    m_material.cSpecular.r = m_material.cSpecular.g = m_material.cSpecular.b = 1;
+    m_material.shininess = 64;
+}
+
+//hard coded light
+void RayScene::initializeSceneLight() {
+    // Use a white directional light from the upper left corner
+//    memset(&m_light, 0, sizeof(m_light));
+    m_light.type = LightType::LIGHT_DIRECTIONAL;
+//    m_light.dir = m_lightDirection;
+    m_light.color.r = m_light.color.g = m_light.color.b = 1;
+    m_light.id = 0;
+}
+
+RayScene::~RayScene()
+{
+}
+

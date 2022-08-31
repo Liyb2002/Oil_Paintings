@@ -1,0 +1,2 @@
+1.how to actively update color everytime
+2.how to use alpha (doesn't seem to work)
