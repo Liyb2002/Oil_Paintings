@@ -7,7 +7,7 @@ public:
     virtual ~FilterBlur() override;
     virtual void apply(Canvas2D *canvas, float param1, float param2) override;
 
-    void Convolve2D(Canvas2D *canvas, std::vector< int > conv);
+    void paintOil(Canvas2D *canvas, std::vector< int > conv);
 
 
 

@@ -15,7 +15,6 @@ FilterBlur::~FilterBlur()
 
 void FilterBlur::apply(Canvas2D *canvas, float param1, float param2) {
 
-    int realParam = (int)param1;
     std::vector< int > conv;
 
     for(int i=0; i<param1*param1; i++){
@@ -23,43 +22,34 @@ void FilterBlur::apply(Canvas2D *canvas, float param1, float param2) {
     }
 
 
-    Convolve2D(canvas, conv);
+    paintOil(canvas, conv);
 
 
 }
 
 
 
-void FilterBlur::Convolve2D(Canvas2D *canvas, std::vector< int > conv) {
-    std::cout <<"Convolve!";
+void FilterBlur::paintOil(Canvas2D *canvas, std::vector< int > conv) {
+    std::cout <<"paintOil!";
 
     RGBA* data = canvas->data();
 
-    // TODO: Task 9 Create buffer to store new image data
     RGBA* result = new RGBA[canvas->width() * canvas->height()];
 
 
-    // TODO: Task 10 Obtain kernel dimension
     float dim = glm::sqrt((float)conv.size());
-
+    int intensityLvl = 20;
 
 
     for (int r = 0; r < canvas->height(); r++) {
         for (int c = 0; c < canvas->width(); c++) {
+            std::vector<int> intensityCount(intensityLvl, 0);
+            std::vector<int> averageR(intensityLvl, 0);
+            std::vector<int> averageG(intensityLvl, 0);
+            std::vector<int> averageB(intensityLvl, 0);
 
 
-            // TODO: Task 11 Initialize color to accumulate convolution data
-            float red_acc = 0;
-            float green_acc = 0;
-            float blue_acc = 0;
-            int count = 0;
 
-
-            // TODO: Task 12
-            // Iterate over the kernel using the value from task 10
-            // Obtain the value at current index of kernel
-            // Find correct index in original image data
-            // Accumulate the kernel applied to pixel value in color_acc
             for(int i=0; i<dim; i++){
                 for(int j=0; j<dim; j++){
 
@@ -70,29 +60,35 @@ void FilterBlur::Convolve2D(Canvas2D *canvas, std::vector< int > conv) {
 
                     if(thisX>0 && thisX <canvas->width() && thisY>0 && thisY<canvas ->height()){
                         RGBA curVal = data[thisX + thisY* canvas -> width()];
-                        count += thisVal;
 
-                        red_acc += (float)curVal.r * (float)thisVal;
-                        green_acc+=(float)curVal.g * (float)thisVal;
-                        blue_acc+=(float)curVal.b * (float)thisVal;
-
+        int curIntensity =
+                (int)((float)curVal.r+(float)curVal.g+(float)curVal.b) * intensityLvl/ (3*255.);
+                intensityCount[curIntensity] +=1;
+                averageR[curIntensity]+= curVal.r;
+                averageG[curIntensity]+= curVal.g;
+                averageB[curIntensity]+= curVal.b;
                     }
                 }
 
             }
 
-/*
-            if(r == 1 && c==1){
-            std::cout<< "red is" << (float)data[c + r*canvas ->width()].r << std::endl;
-            std::cout<< "green is" << (float)data[c + canvas ->width()].g << std::endl;
-            std::cout<< "blue is" << (float)data[c + canvas ->width()].b << std::endl;
-            }*/
+            int curMax = 0;
+            int maxIndex = 0;
+            for(int i=0; i<intensityLvl; i++){
+                if (intensityCount[i] > curMax)
+                    {
+                        curMax = intensityCount[i];
+                        maxIndex = i;
+                    }
 
-            red_acc = red_acc/ count;
-            green_acc = green_acc/count;
-            blue_acc = blue_acc/count;
+            }
 
-            result[c + r*canvas ->width()] = RGBA(red_acc, green_acc, blue_acc, 0);
+            int finalR = averageR[maxIndex]/curMax;
+            int finalG = averageG[maxIndex]/curMax;
+            int finalB = averageB[maxIndex]/curMax;
+
+
+            result[c + r*canvas ->width()] = RGBA(finalR, finalG, finalB, 0);
 
 
 
