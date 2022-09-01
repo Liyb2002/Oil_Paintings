@@ -23,7 +23,10 @@ void FilterBlur::apply(Canvas2D *canvas, float param1, float param2) {
 
   //  paintOil(canvas, conv);
 
-    strokes(canvas);
+    toGrayScale(canvas);
+    Sobel(canvas);
+
+ //   strokes(canvas);
 
 
 }
@@ -157,6 +160,130 @@ void FilterBlur::paintOil(Canvas2D *canvas, std::vector< int > conv) {
         for (int c = 0; c < canvas ->width(); c++) {
 
             data[c + r*canvas ->width()] = result[c + r*canvas ->width()];
+
+        }
+        }
+
+    delete [] result;
+
+    canvas -> update();
+
+}
+
+
+
+void FilterBlur::toGrayScale(Canvas2D *canvas) {
+    std::cout <<"toGrayScale!";
+    int width = canvas->width();
+
+        RGBA* current_pixel = nullptr;
+
+        /* Initialize the first pixel of the first row */
+        RGBA* current_row = canvas->data();
+
+        RGBA* data = canvas->data();
+        size_t currentIndex = 0;
+
+        for (int r = 0; r < canvas->height(); r++) {
+            current_pixel = current_row;
+            currentIndex = r * width;
+
+            for (int c = 0; c < canvas->width(); c++) {
+                // TODO: Task 4
+                const RGBA &pixel = data[currentIndex+c];
+                int Li = 0.299*pixel.r + 0.587*pixel.g + 0.114*pixel.b;
+
+
+                // TODO: Task 6
+                data[currentIndex+c].r = Li;
+                data[currentIndex+c].g = Li;
+                data[currentIndex+c].b = Li;
+
+
+                /* Advance to the next pixel */
+                current_pixel++;
+                currentIndex++;
+            }
+            current_row += width;
+        }
+        canvas->update();
+
+
+}
+
+void FilterBlur::Sobel(Canvas2D *canvas) {
+    std::cout <<"Sobel!";
+
+    RGBA* data = canvas->data();
+    glm::mat3x3 Gx = {-1,0,1, -2,0,2, -1,0,1};
+    glm::mat3x3 Gy = {-1,-2,-1, 0,0,0, 1,2,1};
+
+    glm::mat3x3 conv = {0,1,0, 1,1,1, 0,1,0};
+
+    RGBA* result = new RGBA[canvas->width() * canvas->height()];
+
+    float dim = 3;
+
+
+
+    for (int r = 0; r < canvas->height(); r++) {
+        for (int c = 0; c < canvas->width(); c++) {
+
+
+            float Gx_red_acc = 0;
+            float Gx_green_acc = 0;
+            float Gx_blue_acc = 0;
+            float Gy_red_acc = 0;
+            float Gy_green_acc = 0;
+            float Gy_blue_acc = 0;
+
+            for(int i=0; i<dim; i++){
+                for(int j=0; j<dim; j++){
+
+                    int thisX = c + i - dim/2;
+                    int thisY = r + j - dim/2;
+                    int Gx_thisVal = Gx[j][i];
+                    int Gy_thisVal = Gy[j][i];
+
+
+                    if(thisX>0 && thisX <canvas->width() && thisY>0 && thisY<canvas ->height()){
+                        RGBA curVal = data[thisX + thisY* canvas -> width()];
+
+                        Gx_red_acc += (float)curVal.r * (float)Gx_thisVal;
+                        Gx_green_acc+=(float)curVal.g * (float)Gx_thisVal;
+                        Gx_blue_acc+=(float)curVal.b * (float)Gx_thisVal;
+
+                        Gy_red_acc += (float)curVal.r * (float)Gy_thisVal;
+                        Gy_green_acc+=(float)curVal.g * (float)Gy_thisVal;
+                        Gy_blue_acc+=(float)curVal.b * (float)Gy_thisVal;
+
+
+                    }
+                }
+
+            }
+
+            float g_red = glm::sqrt(glm::dot(Gx_red_acc,Gx_red_acc) + glm::dot(Gy_red_acc,Gy_red_acc));
+            float g_green = glm::sqrt(glm::dot(Gx_green_acc,Gx_green_acc) + glm::dot(Gy_green_acc,Gy_green_acc));
+            float g_blue = glm::sqrt(glm::dot(Gy_blue_acc,Gy_blue_acc) + glm::dot(Gy_blue_acc,Gy_blue_acc));
+
+            result[c + r*canvas ->width()] = RGBA(g_red, g_green, g_blue, 255);
+
+        }
+    }
+
+    for (int r = 0; r < canvas ->height(); r++) {
+        for (int c = 0; c < canvas ->width(); c++) {
+
+            float temptIntensity = (30.*(float)result[c + r*canvas ->width()].r +
+                                    59.*(float)result[c + r*canvas ->width()].g +
+                                     11.*(float)result[c + r*canvas ->width()].b)/100.;
+
+            if(temptIntensity > 150){
+                data[c + r*canvas ->width()] = RGBA(255,255,255,255);
+            }else{
+                 data[c + r*canvas ->width()] = RGBA(0,0,0,255);
+            }
 
         }
         }

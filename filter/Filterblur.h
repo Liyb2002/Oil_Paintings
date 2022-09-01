@@ -13,6 +13,10 @@ public:
     float randXStroke (int thetaRand, int i);
     float randYStroke (int thetaRand, int i);
 
+    void toGrayScale(Canvas2D *canvas);
+    void Sobel(Canvas2D *canvas);
+
+
 
 
 
