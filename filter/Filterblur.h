@@ -8,13 +8,13 @@ public:
     virtual void apply(Canvas2D *canvas, float param1, float param2) override;
 
     void paintOil(Canvas2D *canvas, std::vector< int > conv);
-    void strokes(Canvas2D *canvas);
+    void strokes(Canvas2D *canvas, RGBA* edges);
 
     float randXStroke (int thetaRand, int i);
     float randYStroke (int thetaRand, int i);
 
     void toGrayScale(Canvas2D *canvas);
-    void Sobel(Canvas2D *canvas);
+    void Sobel(Canvas2D *canvas, RGBA* edges);
 
 
 
