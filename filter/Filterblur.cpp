@@ -21,7 +21,7 @@ void FilterBlur::apply(Canvas2D *canvas, float param1, float param2) {
         conv.push_back(1);
     }
 
-    paintOil(canvas, conv);
+  //  paintOil(canvas, conv);
 
     strokes(canvas);
 
@@ -169,8 +169,12 @@ void FilterBlur::paintOil(Canvas2D *canvas, std::vector< int > conv) {
 
 float FilterBlur::randXStroke (int thetaRand, int i){
     //45 , -45 degree
-    if(thetaRand == 0 || thetaRand == 1 || thetaRand == 4){
+    if(thetaRand == 0 || thetaRand == 4){
         return i ;
+    }
+
+    if(thetaRand == 1){
+        return 0;
     }
 
     //26.5  ,  -26.5 degree
