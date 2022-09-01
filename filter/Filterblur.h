@@ -8,6 +8,7 @@ public:
     virtual void apply(Canvas2D *canvas, float param1, float param2) override;
 
     void paintOil(Canvas2D *canvas, std::vector< int > conv);
+    void strokes(Canvas2D *canvas);
 
 
 

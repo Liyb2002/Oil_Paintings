@@ -21,11 +21,59 @@ void FilterBlur::apply(Canvas2D *canvas, float param1, float param2) {
         conv.push_back(1);
     }
 
-
     paintOil(canvas, conv);
+
+  //  strokes(canvas);
 
 
 }
+
+void FilterBlur::strokes(Canvas2D *canvas) {
+
+    std::cout <<"strokes!";
+
+    RGBA* data = canvas->data();
+
+    RGBA* result = new RGBA[canvas->width() * canvas->height()];
+
+    for (int r = 0; r < canvas->height(); r+=4) {
+        for (int c = 0; c < canvas->width(); c+=4) {
+
+            //length of stroke is 8
+            for(int i=1; i<8; i++){
+                //brush radius is 4
+                for(int j=0; j<20; j++){
+
+
+                int thisX = c + i + j;
+                int thisY = r -i;
+
+                if(thisX>0 && thisX <canvas->width() && thisY>0 && thisY<canvas ->height()){
+
+                    result[thisX + thisY*canvas ->width()] = data[c + r*canvas ->width()];
+                }
+
+            }
+            }
+
+        }
+        }
+
+    for (int r = 0; r < canvas ->height(); r++) {
+        for (int c = 0; c < canvas ->width(); c++) {
+
+            data[c + r*canvas ->width()] = result[c + r*canvas ->width()];
+
+        }
+        }
+
+    delete [] result;
+
+    canvas -> update();
+
+
+}
+
 
 
 
@@ -88,7 +136,7 @@ void FilterBlur::paintOil(Canvas2D *canvas, std::vector< int > conv) {
             int finalB = averageB[maxIndex]/curMax;
 
 
-            result[c + r*canvas ->width()] = RGBA(finalR, finalG, finalB, 0);
+            result[c + r*canvas ->width()] = RGBA(finalR, finalG, finalB, 255);
 
 
 
