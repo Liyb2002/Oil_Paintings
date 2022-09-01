@@ -23,7 +23,7 @@ void FilterBlur::apply(Canvas2D *canvas, float param1, float param2) {
 
     RGBA* edges = new RGBA[canvas->width() * canvas->height()];
 
-  //  paintOil(canvas, conv);
+ //   paintOil(canvas, conv);
 
  //   toGrayScale(canvas);
     Sobel(canvas, edges);
@@ -44,11 +44,15 @@ void FilterBlur::strokes(Canvas2D *canvas, RGBA* edges) {
     RGBA* result = new RGBA[canvas->width() * canvas->height()];
 
     for (int r = 0; r < canvas->height(); r+=2) {
-        for (int c = 0; c < canvas->width(); c+=4) {
+        for (int c = 0; c < canvas->width(); c+=2) {
 
-            int strokeRand = std::rand()%6 + 4;
-            int radiusRand = std::rand()%5 + 4;
+            int strokeRand = std::rand()%6 + 2;
+            int radiusRand = std::rand()%5 + 3;
             int thetaRand = std::rand()%6;
+
+            if(c ==10){
+                std::cout << strokeRand <<std::endl;
+            }
 
 
             //brush radius in [1,3]
@@ -72,7 +76,10 @@ void FilterBlur::strokes(Canvas2D *canvas, RGBA* edges) {
                         break;
                     }
 
-                        result[thisX + thisY*canvas ->width()] = data[c + r*canvas ->width()];
+                        result[thisX + thisY*canvas ->width()].r = data[c + r*canvas ->width()].r;
+                        result[thisX + thisY*canvas ->width()].g = data[c + r*canvas ->width()].g;
+                        result[thisX + thisY*canvas ->width()].b = data[c + r*canvas ->width()].b;
+                        result[thisX + thisY*canvas ->width()].a = 255 * (1 - (i+j)/(radiusRand+strokeRand));
 
                 }
 
@@ -295,12 +302,12 @@ void FilterBlur::Sobel(Canvas2D *canvas, RGBA* edges) {
                                     59.*(float)result[c + r*canvas ->width()].g +
                                      11.*(float)result[c + r*canvas ->width()].b)/100.;
 
-            if(temptIntensity > 50){
+            if(temptIntensity > 180){
                 edges[c + r*canvas ->width()] = RGBA(255,255,255,255);
-            //    data[c + r*canvas ->width()] = RGBA(255,255,255,255);
+          //     data[c + r*canvas ->width()] = RGBA(255,255,255,255);
             }else{
                  edges[c + r*canvas ->width()] = RGBA(0,0,0,255);
-            //     data[c + r*canvas ->width()] = RGBA(0,0,0,255);
+           //      data[c + r*canvas ->width()] = RGBA(0,0,0,255);
             }
 
         }
@@ -308,7 +315,7 @@ void FilterBlur::Sobel(Canvas2D *canvas, RGBA* edges) {
 
     delete [] result;
 
- //   canvas->update();
+  // canvas->update();
 
 }
 
