@@ -23,7 +23,7 @@ void FilterBlur::apply(Canvas2D *canvas, float param1, float param2) {
 
     paintOil(canvas, conv);
 
-  //  strokes(canvas);
+    strokes(canvas);
 
 
 }
@@ -36,17 +36,22 @@ void FilterBlur::strokes(Canvas2D *canvas) {
 
     RGBA* result = new RGBA[canvas->width() * canvas->height()];
 
-    for (int r = 0; r < canvas->height(); r+=4) {
-        for (int c = 0; c < canvas->width(); c+=4) {
+    for (int r = 0; r < canvas->height(); r+=1) {
+        for (int c = 0; c < canvas->width(); c+=2) {
 
-            //length of stroke is 8
-            for(int i=1; i<8; i++){
-                //brush radius is 4
-                for(int j=0; j<20; j++){
+            int strokeRand = std::rand()%6 + 4;
+            int radiusRand = std::rand()%5 + 3;
+            int thetaRand = std::rand()%6;
 
 
-                int thisX = c + i + j;
-                int thisY = r -i;
+
+            //length of stroke in [4,10]
+            for(int i=1; i<strokeRand; i++){
+                //brush radius in [1,3]
+                for(int j=0; j<radiusRand; j++){
+
+                    int thisX = c + j + randXStroke(thetaRand, i);
+                    int thisY = r + randYStroke(thetaRand, i);
 
                 if(thisX>0 && thisX <canvas->width() && thisY>0 && thisY<canvas ->height()){
 
@@ -61,6 +66,11 @@ void FilterBlur::strokes(Canvas2D *canvas) {
 
     for (int r = 0; r < canvas ->height(); r++) {
         for (int c = 0; c < canvas ->width(); c++) {
+            if(result[c + r*canvas ->width()].r == 0 &&
+                    result[c + r*canvas ->width()].g == 0 &&
+                    result[c + r*canvas ->width()].b == 0){
+                continue;
+            }
 
             data[c + r*canvas ->width()] = result[c + r*canvas ->width()];
 
@@ -156,6 +166,40 @@ void FilterBlur::paintOil(Canvas2D *canvas, std::vector< int > conv) {
     canvas -> update();
 
 }
+
+float FilterBlur::randXStroke (int thetaRand, int i){
+    //45 , -45 degree
+    if(thetaRand == 0 || thetaRand == 1 || thetaRand == 4){
+        return i ;
+    }
+
+    //26.5  ,  -26.5 degree
+    if(thetaRand == 2 || thetaRand == 3){
+        return 2*i ;
+    }
+
+    if(thetaRand == 5){
+        return -i ;
+    }
+
+}
+
+float FilterBlur::randYStroke (int thetaRand, int i){
+    if(thetaRand == 2 || thetaRand == 3){
+        return -i ;
+    }
+
+    if(thetaRand == 0 || thetaRand == 5  || thetaRand == 4){
+        return 0;
+    }
+
+    if(thetaRand == 1 ){
+        return i ;
+    }
+
+
+}
+
 
 
 
