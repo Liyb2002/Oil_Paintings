@@ -29,7 +29,7 @@ void FilterBlur::apply(Canvas2D *canvas, float param1, float param2) {
     Sobel(canvas, edges);
 
   //  strokes(canvas, edges);
-     gradient_Strokes(canvas, edges);
+  //   gradient_Strokes(canvas, edges);
 
     delete [] edges;
 
@@ -175,7 +175,7 @@ void FilterBlur::gradient_Strokes(Canvas2D *canvas, RGBA* edges) {
                             + result[c + r*canvas ->width() - canvas ->width()].b
                             + result[c + r*canvas ->width() + canvas ->width()].b)/4.0;
 
-                    std::cout<<"gradient interpolated"<<std::endl;
+         //           std::cout<<"gradient interpolated"<<std::endl;
                 }
 
             }else{
@@ -444,10 +444,10 @@ void FilterBlur::Sobel(Canvas2D *canvas, RGBA* edges) {
 
             if(temptIntensity > 180){
                 edges[c + r*canvas ->width()] = RGBA(255,255,255,255);
-          //     data[c + r*canvas ->width()] = RGBA(255,255,255,255);
+               data[c + r*canvas ->width()] = RGBA(255,255,255,255);
             }else{
                  edges[c + r*canvas ->width()] = RGBA(0,0,0,255);
-           //      data[c + r*canvas ->width()] = RGBA(0,0,0,255);
+                 data[c + r*canvas ->width()] = RGBA(0,0,0,255);
             }
 
         }
@@ -455,7 +455,7 @@ void FilterBlur::Sobel(Canvas2D *canvas, RGBA* edges) {
 
     delete [] result;
 
-  // canvas->update();
+   canvas->update();
 
 }
 
