@@ -28,7 +28,8 @@ void FilterBlur::apply(Canvas2D *canvas, float param1, float param2) {
  //   toGrayScale(canvas);
     Sobel(canvas, edges);
 
-    strokes(canvas, edges);
+  //  strokes(canvas, edges);
+     gradient_Strokes(canvas, edges);
 
     delete [] edges;
 
@@ -56,7 +57,7 @@ void FilterBlur::strokes(Canvas2D *canvas, RGBA* edges) {
 
 
             //brush radius in [1,3]
-            for(int j=0; j<radiusRand; j++){
+            for(int j=-radiusRand; j<radiusRand; j++){
                 if(edges[c + r*canvas ->width() +j].r > 0){
                  //   result[thisX + thisY*canvas ->width()] = RGBA (0,0,0,0);
 
@@ -67,6 +68,118 @@ void FilterBlur::strokes(Canvas2D *canvas, RGBA* edges) {
 
                     int thisX = c + j + randXStroke(thetaRand, i);
                     int thisY = r + randYStroke(thetaRand, i);
+
+                if(thisX>0 && thisX <canvas->width() && thisY>0 && thisY<canvas ->height()){
+
+                    if(edges[thisX + thisY*canvas ->width() +j].r > 0){
+                     //   result[thisX + thisY*canvas ->width()] = RGBA (0,0,0,0);
+
+                        break;
+                    }
+
+                        result[thisX + thisY*canvas ->width()].r = data[c + r*canvas ->width()].r;
+                        result[thisX + thisY*canvas ->width()].g = data[c + r*canvas ->width()].g;
+                        result[thisX + thisY*canvas ->width()].b = data[c + r*canvas ->width()].b;
+                        result[thisX + thisY*canvas ->width()].a = 255 * (1 - (i+j)/(radiusRand+strokeRand));
+
+                }
+
+            }
+            }
+
+        }
+        }
+
+    for (int r = 0; r < canvas ->height(); r++) {
+        for (int c = 0; c < canvas ->width(); c++) {
+            if(result[c + r*canvas ->width()].r == 0 &&
+                    result[c + r*canvas ->width()].g == 0 &&
+                    result[c + r*canvas ->width()].b == 0){
+           //     data[c + r*canvas ->width()] = RGBA(255,0,0,0);
+                continue;
+            }
+
+            data[c + r*canvas ->width()] = result[c + r*canvas ->width()];
+
+        }
+        }
+
+    delete [] result;
+
+    canvas -> update();
+
+
+}
+
+
+void FilterBlur::gradient_Strokes(Canvas2D *canvas, RGBA* edges) {
+
+    std::cout <<"gradient_Strokes!";
+
+    RGBA* data = canvas->data();
+
+    RGBA* result = new RGBA[canvas->width() * canvas->height()];
+
+    glm::mat3x3 Gx = {-1,0,1, -2,0,2, -1,0,1};
+    glm::mat3x3 Gy = {-1,-2,-1, 0,0,0, 1,2,1};
+    float dim = 3;
+
+
+    for (int r = 0; r < canvas->height(); r+=2) {
+        for (int c = 0; c < canvas->width(); c+=2) {
+
+            float Gx_val = 0;
+            float Gy_val = 0;
+
+            for(int i=0; i<dim; i++){
+                for(int j=0; j<dim; j++){
+
+                    int thisX = c + i - dim/2;
+                    int thisY = r + j - dim/2;
+                    int Gx_thisVal = Gx[j][i];
+                    int Gy_thisVal = Gy[j][i];
+
+
+                    if(thisX>0 && thisX <canvas->width() && thisY>0 && thisY<canvas ->height()){
+                        RGBA curVal = data[thisX + thisY* canvas -> width()];
+
+                        Gx_val += (float)curVal.r * (float)Gx_thisVal;
+                        Gx_val+=(float)curVal.g * (float)Gx_thisVal;
+                        Gx_val+=(float)curVal.b * (float)Gx_thisVal;
+
+                        Gy_val += (float)curVal.r * (float)Gy_thisVal;
+                        Gy_val+=(float)curVal.g * (float)Gy_thisVal;
+                        Gy_val+=(float)curVal.b * (float)Gy_thisVal;
+
+                    }
+                }
+
+            }
+
+            float theta = glm::atan(Gy_val/Gx_val) + 1.57;
+
+            int strokeRand = std::rand()%12 + 8;
+            int radiusRand = std::rand()%2 + 1;
+
+
+            //brush radius in [1,3]
+            for(int j=-radiusRand; j<radiusRand; j++){
+                if(edges[c + r*canvas ->width() +j].r > 0){
+                 //   result[thisX + thisY*canvas ->width()] = RGBA (0,0,0,0);
+
+                    break;
+                }
+                //length of stroke in [4,10]
+                for(int i=1; i<strokeRand; i++){
+
+                    int thisX = c + j + (int)i*glm::cos(theta);
+                    int thisY = r + (int)i*glm::sin(theta);
+
+                    if(std::rand()%2 == 0){
+                        thisX = c + (int)i*glm::cos(theta);
+                        thisY = r - j+ (int)i*glm::sin(theta);
+                    }
+
 
                 if(thisX>0 && thisX <canvas->width() && thisY>0 && thisY<canvas ->height()){
 

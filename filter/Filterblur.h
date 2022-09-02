@@ -9,6 +9,8 @@ public:
 
     void paintOil(Canvas2D *canvas, std::vector< int > conv);
     void strokes(Canvas2D *canvas, RGBA* edges);
+    void gradient_Strokes(Canvas2D *canvas, RGBA* edges);
+
 
     float randXStroke (int thetaRand, int i);
     float randYStroke (int thetaRand, int i);
