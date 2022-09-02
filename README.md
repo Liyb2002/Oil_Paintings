@@ -51,6 +51,8 @@ work well on new images.)
 <p>
 <img src="./images/black_white_edge.png" width = 500px >
 <p\> 
+ 
+ This is the result of edge detection.
 
 <p>
 <img src="./images/stroke-edge.png" width = 1000px >
