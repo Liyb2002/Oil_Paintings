@@ -156,6 +156,30 @@ void FilterBlur::gradient_Strokes(Canvas2D *canvas, RGBA* edges) {
 
             }
 
+            if(abs(Gy_val)<5 && abs(Gx_val)<5){
+                if (1<c && c<canvas ->width()-2
+                        && 1<r && r<canvas ->width()-2){
+                    result[c + r*canvas ->width()].r =
+                            (result[c + r*canvas ->width()-1].r + result[c + r*canvas ->width()+1].r
+                            + result[c + r*canvas ->width() - canvas ->width()].r
+                            + result[c + r*canvas ->width() + canvas ->width()].r)/4.0;
+
+                    result[c + r*canvas ->width()].g =
+                            (result[c + r*canvas ->width()-1].g + result[c + r*canvas ->width()+1].g
+                            + result[c + r*canvas ->width() - canvas ->width()].g
+                            + result[c + r*canvas ->width() + canvas ->width()].g)/4.0;
+
+
+                    result[c + r*canvas ->width()].b =
+                            (result[c + r*canvas ->width()-1].b + result[c + r*canvas ->width()+1].b
+                            + result[c + r*canvas ->width() - canvas ->width()].b
+                            + result[c + r*canvas ->width() + canvas ->width()].b)/4.0;
+
+                    std::cout<<"gradient interpolated"<<std::endl;
+                }
+
+            }else{
+
             float theta = glm::atan(Gy_val/Gx_val) + 1.57;
 
             int strokeRand = std::rand()%12 + 8;
@@ -198,6 +222,9 @@ void FilterBlur::gradient_Strokes(Canvas2D *canvas, RGBA* edges) {
 
             }
             }
+
+
+        }
 
         }
         }
