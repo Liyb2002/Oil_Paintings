@@ -29,7 +29,7 @@ void FilterBlur::apply(Canvas2D *canvas, float param1, float param2) {
     Sobel(canvas, edges);
 
   //  strokes(canvas, edges);
-  //   gradient_Strokes(canvas, edges);
+     gradient_Strokes(canvas, edges);
 
     delete [] edges;
 

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>CS 123: Introduction to Computer Graphics</string>
+   <string>Impressionism Filter</string>
   </property>
   <property name="dockNestingEnabled">
    <bool>true</bool>
@@ -699,7 +699,7 @@
      <item>
       <widget class="QGroupBox" name="filterType">
        <property name="title">
-        <string>Filter Type</string>
+        <string>Impressionism Filter</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_6">
         <property name="topMargin">
@@ -783,7 +783,7 @@
         <item>
          <widget class="QRadioButton" name="filterTypeBlur">
           <property name="text">
-           <string>Blur</string>
+           <string>Impressionism</string>
           </property>
          </widget>
         </item>

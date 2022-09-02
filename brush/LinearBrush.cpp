@@ -23,14 +23,6 @@ LinearBrush::~LinearBrush()
 }
 
 void LinearBrush::makeMask() {
-    // @TODO: [BRUSH] Set up the mask for your Linear brush here...
-    m_mask.resize(getRadius() + 1);
-
-    float stepSize = 1/m_mask.size();
-
-    for(int i=0; i<m_mask.size() ; i++){
-        m_mask[i] = 1 - stepSize*i;
-    }
 
 }
 
