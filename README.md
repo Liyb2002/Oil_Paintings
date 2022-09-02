@@ -61,4 +61,21 @@ work well on new images.)
 
 However, great artists never use strokes only in one direction. And the brush strokes are going to the direction where the color changes least.
 
-3.1 Calculate gradient change again. The gradient is the direction of most change, and normal to the gradient is the direction of zero change
+3.1 Calculate gradient change again (Gx, Gy). The gradient is the direction of most change, and normal to the gradient is the direction of zero change.
+It is suggested to use a Gaussian kernel with radius 4 pixels greater at this step, yet I chose to use the same kernel as the one used in step2.
+
+3.2 Calculate the new direction of strokes. theta = arctan(Gy/Gx) + 1.57rad
+
+<p>
+<img src="./images/stroke-gradient.png" width = 1000px >
+<p\> 
+
+
+### Step4
+
+Color has very little change, or zero change, in certain pixels. Thus while both Gx and Gy are small, arctan(Gy/Gx) may generate unexpected values. We choose to interpolate these pixels'colors using colors of nearby pixels.
+
+
+<p>
+<img src="./images/gradient-interpolation.png" width = 1000px >
+<p\> 
