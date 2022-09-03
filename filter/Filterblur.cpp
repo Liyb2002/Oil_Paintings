@@ -444,10 +444,10 @@ void FilterBlur::Sobel(Canvas2D *canvas, RGBA* edges) {
 
             if(temptIntensity > 180){
                 edges[c + r*canvas ->width()] = RGBA(255,255,255,255);
-               data[c + r*canvas ->width()] = RGBA(255,255,255,255);
+          //     data[c + r*canvas ->width()] = RGBA(255,255,255,255);
             }else{
                  edges[c + r*canvas ->width()] = RGBA(0,0,0,255);
-                 data[c + r*canvas ->width()] = RGBA(0,0,0,255);
+          //       data[c + r*canvas ->width()] = RGBA(0,0,0,255);
             }
 
         }
@@ -455,7 +455,7 @@ void FilterBlur::Sobel(Canvas2D *canvas, RGBA* edges) {
 
     delete [] result;
 
-   canvas->update();
+  // canvas->update();
 
 }
 
