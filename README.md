@@ -81,3 +81,19 @@ Color has very little change, or zero change, in certain pixels. Thus while both
 <p>
 <img src="./images/gradient-interpolation.png" width = 1000px >
 <p\> 
+
+### Optimization
+
+The project is an O(n^2) algorithm, given the width and height of the input n.
+
+There are tons of optimization can be done on this project. Currently each step is calculated seperatedly so that I can test the effect of each process. However, it's obviously possible to do all the calculations in one loop.
+
+### More results
+
+<p>
+<img src="./images/result1.png" width = 1000px >
+<p\> 
+
+<p>
+<img src="./images/brown_result.png" width = 1000px >
+<p\> 
